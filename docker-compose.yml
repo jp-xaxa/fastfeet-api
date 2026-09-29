@@ -1,0 +1,13 @@
+services:
+  postgres:
+    container_name: fast-feet-api
+    image: bitnami/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres_fast_feet
+      POSTGRES_PASSWORD: docker_fast_feet
+      POSTGRES_DB: fast_feet_api
+      PGDATA: /data/postgres
+    volumes:
+      - ./data/pg:/data/postgres
