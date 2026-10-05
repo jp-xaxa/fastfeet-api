@@ -5,9 +5,11 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: postgres_fast_feet
-      POSTGRES_PASSWORD: docker_fast_feet
-      POSTGRES_DB: fast_feet_api
-      PGDATA: /data/postgres
+      POSTGRESQL_USERNAME: postgres_fast_feet
+      POSTGRESQL_PASSWORD: docker_fast_feet
+      POSTGRESQL_DATABASE: fast_feet_api
     volumes:
-      - ./data/pg:/data/postgres
+      - fast_feet_pg_data:/bitnami/postgresql
+
+volumes:
+  fast_feet_pg_data:
