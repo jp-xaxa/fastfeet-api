@@ -1,23 +1,28 @@
 @baseUrl = http://localhost:3333
-# @authToken = {{authenticate.response.body.access_token}}
+@authToken = {{authenticate.response.body.access_token}}
 
-# @name create_account
-POST {{baseUrl}}/accounts
+# @name authenticate
+POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-  "name": "João Pedro",
   "cpf": "529.982.247-25",
   "password": "123456"
 }
 
 ###
 
-# # @name authenticate
-# POST {{baseUrl}}/sessions
-# Content-Type: application/json
+# @name create_account
+POST {{baseUrl}}/accounts
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
-# {
-#   "email": "joaoPedro@test.com.br",
-#   "password": "123456"
-# }
+{
+  "name": "Nanda",
+  "cpf": "139.052.223-70",
+  "password": "123456"
+}
+
+###
+
+

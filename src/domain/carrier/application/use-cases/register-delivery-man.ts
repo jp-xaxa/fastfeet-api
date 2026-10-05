@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { Either, right, left } from '@/core/either.js'
 import { DeliveryMan } from '@/domain/carrier/enterprise/entities/delivery-man.js'
 import { DeliveryMansRepository } from '../repositories/delivery-man-repository.js'
-import { DeliveryManAlreadyExistsError } from './errors/delivery-man-already-exists-error.js'
-// import { InvalidCpfError } from './errors/invalid-cpf-error.js'
+import { AdministratorsRepository } from '../repositories/administrator-repository.js'
+import { CpfAlreadyInUseError } from './errors/cpf-already-in-use-error.js'
 import { HashGenerator } from '../cryptography/hash-generator.js'
-// import { CpfValidator } from '../gateways/cpfValidator/cpf-validator.js'
 
 interface RegisterDeliveryManUseCaseRequest {
   name: string
@@ -14,7 +13,7 @@ interface RegisterDeliveryManUseCaseRequest {
 }
 
 type RegisterDeliveryManUseCaseResponse = Either<
-  DeliveryManAlreadyExistsError,
+  CpfAlreadyInUseError,
   {
     deliveryMan: DeliveryMan
   }
@@ -24,8 +23,8 @@ type RegisterDeliveryManUseCaseResponse = Either<
 export class RegisterDeliveryManUseCase {
   constructor(
     private deliveryMansRepository: DeliveryMansRepository,
+    private administratorsRepository: AdministratorsRepository,
     private hashGenerator: HashGenerator,
-    // private cpfValidator: CpfValidator,
   ) {}
 
   async execute({
@@ -33,18 +32,16 @@ export class RegisterDeliveryManUseCase {
     cpf,
     password,
   }: RegisterDeliveryManUseCaseRequest): Promise<RegisterDeliveryManUseCaseResponse> {
-    const deliveryManWithSameCpf =
-      await this.deliveryMansRepository.findByCpf(cpf)
+    // O CPF é único entre todos os usuários, não só entre entregadores.
+    const [deliveryManWithSameCpf, administratorWithSameCpf] =
+      await Promise.all([
+        this.deliveryMansRepository.findByCpf(cpf),
+        this.administratorsRepository.findByCpf(cpf),
+      ])
 
-    if (deliveryManWithSameCpf) {
-      return left(new DeliveryManAlreadyExistsError(cpf))
+    if (deliveryManWithSameCpf || administratorWithSameCpf) {
+      return left(new CpfAlreadyInUseError(cpf))
     }
-
-    // const validCpf = await this.cpfValidator.validator(cpf)
-
-    // if (!validCpf) {
-    //   return left(new InvalidCpfError(cpf))
-    // }
 
     const hashedPassword = await this.hashGenerator.hash(password)
 

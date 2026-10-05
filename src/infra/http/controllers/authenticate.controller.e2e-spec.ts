@@ -24,7 +24,7 @@ describe('Authenticate (E2E)', () => {
   })
 
   test('[POST] /sessions (delivery man)', async () => {
-    const cpfGenerate = cpf.generate(true)
+    const cpfGenerate = cpf.generate()
 
     await prisma.user.create({
       data: {
@@ -35,10 +35,13 @@ describe('Authenticate (E2E)', () => {
       },
     })
 
-    const response = await request(app.getHttpServer()).post('/sessions').send({
-      cpf: cpfGenerate,
-      password: '123456',
-    })
+    // Login com máscara deve encontrar o CPF salvo só com dígitos.
+    const response = await request(app.getHttpServer())
+      .post('/sessions')
+      .send({
+        cpf: cpf.format(cpfGenerate),
+        password: '123456',
+      })
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toEqual({
@@ -47,7 +50,7 @@ describe('Authenticate (E2E)', () => {
   })
 
   test('[POST] /sessions (administrator)', async () => {
-    const cpfGenerate = cpf.generate(true)
+    const cpfGenerate = cpf.generate()
 
     await prisma.user.create({
       data: {

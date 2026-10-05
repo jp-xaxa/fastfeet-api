@@ -17,7 +17,8 @@ import { Public } from '@/infra/auth/public.js'
 const { cpf: zCpf } = zodValidator(z)
 
 const authenticateBodySchema = z.object({
-  cpf: zCpf(),
+  // Mesma normalização do cadastro, para encontrar o CPF salvo só com dígitos.
+  cpf: zCpf().transform((value) => value.replace(/\D/g, '')),
   password: z.string(),
 })
 

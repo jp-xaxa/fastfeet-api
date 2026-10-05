@@ -1,10 +1,13 @@
 import { InMemoryDeliveryMansRepository } from '@/test/repositories/in-memory-delivery-man-repository.js'
+import { InMemoryAdministratorsRepository } from '@/test/repositories/in-memory-administrator-repository.js'
 import { FakeHasher } from '@/test/cryptography/fake-hasher.js'
 import { makeDeliveryMan } from '@/test/factories/make-delivery-man.js'
+import { makeAdministrator } from '@/test/factories/make-administrator.js'
 import { RegisterDeliveryManUseCase } from './register-delivery-man.js'
-import { DeliveryManAlreadyExistsError } from './errors/delivery-man-already-exists-error.js'
+import { CpfAlreadyInUseError } from './errors/cpf-already-in-use-error.js'
 
 let inMemoryDeliveryMansRepository: InMemoryDeliveryMansRepository
+let inMemoryAdministratorsRepository: InMemoryAdministratorsRepository
 let fakeHasher: FakeHasher
 
 let sut: RegisterDeliveryManUseCase
@@ -12,10 +15,12 @@ let sut: RegisterDeliveryManUseCase
 describe('Register Delivery Man', () => {
   beforeEach(() => {
     inMemoryDeliveryMansRepository = new InMemoryDeliveryMansRepository()
+    inMemoryAdministratorsRepository = new InMemoryAdministratorsRepository()
     fakeHasher = new FakeHasher()
 
     sut = new RegisterDeliveryManUseCase(
       inMemoryDeliveryMansRepository,
+      inMemoryAdministratorsRepository,
       fakeHasher,
     )
   })
@@ -60,6 +65,22 @@ describe('Register Delivery Man', () => {
     })
 
     expect(result.isLeft()).toBe(true)
-    expect(result.value).toBeInstanceOf(DeliveryManAlreadyExistsError)
+    expect(result.value).toBeInstanceOf(CpfAlreadyInUseError)
+  })
+
+  it('should not be able to register a delivery man with an administrator cpf', async () => {
+    inMemoryAdministratorsRepository.items.push(
+      makeAdministrator({ cpf: '52998224725' }),
+    )
+
+    const result = await sut.execute({
+      name: 'John Doe',
+      cpf: '52998224725',
+      password: '123456',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(CpfAlreadyInUseError)
+    expect(inMemoryDeliveryMansRepository.items).toHaveLength(0)
   })
 })
