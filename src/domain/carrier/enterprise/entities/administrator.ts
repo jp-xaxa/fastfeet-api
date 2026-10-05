@@ -5,7 +5,6 @@ export interface AdministratorProps {
   name: string
   cpf: string
   password: string
-  // status
 }
 
 export class Administrator extends Entity<AdministratorProps> {
