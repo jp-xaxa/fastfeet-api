@@ -3,6 +3,7 @@ import { InMemoryAdministratorsRepository } from '@/test/repositories/in-memory-
 import { FakeHasher } from '@/test/cryptography/fake-hasher.js'
 import { makeDeliveryMan } from '@/test/factories/make-delivery-man.js'
 import { makeAdministrator } from '@/test/factories/make-administrator.js'
+
 import { RegisterDeliveryManUseCase } from './register-delivery-man.js'
 import { CpfAlreadyInUseError } from './errors/cpf-already-in-use-error.js'
 

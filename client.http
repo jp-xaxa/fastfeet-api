@@ -7,6 +7,7 @@ Content-Type: application/json
 
 {
   "cpf": "529.982.247-25",
+  //"cpf": "139.052.223-70",
   "password": "123456"
 }
 
@@ -24,5 +25,8 @@ Authorization: Bearer {{authToken}}
 }
 
 ###
-
+# @name delete_delivery_man
+DELETE {{baseUrl}}/delivery-man/4b670a9e-9862-4a81-b1e3-bf78bd1be7ef
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 

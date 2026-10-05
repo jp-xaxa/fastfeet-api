@@ -8,7 +8,7 @@ import { cpf } from 'cpf-cnpj-validator'
 import { AppModule } from '../../app.module.js'
 import { PrismaService } from '../../database/prisma/prisma.service.js'
 
-describe('Register Account (E2E)', () => {
+describe('Delete Delivery Man (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let jwt: JwtService
@@ -45,8 +45,8 @@ describe('Register Account (E2E)', () => {
     })
   })
 
-  test('[POST] /accounts', async () => {
-    const response = await request(app.getHttpServer())
+  test('[DELETE] /delivery-man/:id', async () => {
+    const createDeliveryMan = await request(app.getHttpServer())
       .post('/accounts')
       .set('Authorization', `Bearer ${administratorToken}`)
       .send({
@@ -55,7 +55,7 @@ describe('Register Account (E2E)', () => {
         password: '123456',
       })
 
-    expect(response.statusCode).toBe(201)
+    expect(createDeliveryMan.statusCode).toBe(201)
 
     const userOnDatabase = await prisma.user.findUnique({
       where: {
@@ -64,45 +64,26 @@ describe('Register Account (E2E)', () => {
     })
 
     expect(userOnDatabase).toBeTruthy()
-  })
 
-  test('[POST] /accounts (cpf already in use by an administrator)', async () => {
+    const deliveryManId = userOnDatabase?.id
+
     const response = await request(app.getHttpServer())
-      .post('/accounts')
+      .delete(`/delivery-man/${deliveryManId}`)
       .set('Authorization', `Bearer ${administratorToken}`)
       .send({
         name: 'João Pedro',
-        cpf: cpf.format(administratorCpf),
+        cpf: '529.982.247-25',
         password: '123456',
       })
 
-    expect(response.statusCode).toBe(409)
-  })
+    expect(response.statusCode).toBe(204)
 
-  test('[POST] /accounts (delivery man is not allowed)', async () => {
-    const deliveryMan = await prisma.user.create({
-      data: {
-        name: 'Entregador',
-        cpf: cpf.generate(),
-        password: await hash('123456', 8),
-        role: 'DELIVERY_MAN',
+    const deliveryManOnDatabase = await prisma.user.findUnique({
+      where: {
+        id: deliveryManId,
       },
     })
 
-    const deliveryManToken = jwt.sign({
-      sub: deliveryMan.id,
-      role: 'DELIVERY_MAN',
-    })
-
-    const response = await request(app.getHttpServer())
-      .post('/accounts')
-      .set('Authorization', `Bearer ${deliveryManToken}`)
-      .send({
-        name: 'João Pedro',
-        cpf: cpf.generate(),
-        password: '123456',
-      })
-
-    expect(response.statusCode).toBe(403)
+    expect(deliveryManOnDatabase).toBeNull()
   })
 })
