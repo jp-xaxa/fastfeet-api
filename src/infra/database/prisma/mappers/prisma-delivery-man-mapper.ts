@@ -14,12 +14,13 @@ export class PrismaDeliveryManMapper {
     )
   }
 
-  static toPrisma(student: DeliveryMan): Prisma.UserUncheckedCreateInput {
+  static toPrisma(deliveryMan: DeliveryMan): Prisma.UserUncheckedCreateInput {
     return {
-      id: student.id.toString(),
-      name: student.name,
-      cpf: student.cpf,
-      password: student.password,
+      id: deliveryMan.id.toString(),
+      name: deliveryMan.name,
+      cpf: deliveryMan.cpf,
+      password: deliveryMan.password,
+      role: 'DELIVERY_MAN',
     }
   }
 }

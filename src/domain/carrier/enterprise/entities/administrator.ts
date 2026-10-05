@@ -21,8 +21,8 @@ export class Administrator extends Entity<AdministratorProps> {
   }
 
   static create(props: AdministratorProps, id?: UniqueEntityID) {
-    const student = new Administrator(props, id)
+    const administrator = new Administrator(props, id)
 
-    return student
+    return administrator
   }
 }

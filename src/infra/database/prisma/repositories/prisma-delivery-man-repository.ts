@@ -10,9 +10,10 @@ export class PrismaDeliveryMansRepository implements DeliveryMansRepository {
   constructor(private prisma: PrismaService) {}
 
   async findById(id: string): Promise<DeliveryMan | null> {
-    const deliveryMan = await this.prisma.user.findUnique({
+    const deliveryMan = await this.prisma.user.findFirst({
       where: {
         id,
+        role: 'DELIVERY_MAN',
       },
     })
 
@@ -24,9 +25,10 @@ export class PrismaDeliveryMansRepository implements DeliveryMansRepository {
   }
 
   async findByCpf(cpf: string): Promise<DeliveryMan | null> {
-    const deliveryMan = await this.prisma.user.findUnique({
+    const deliveryMan = await this.prisma.user.findFirst({
       where: {
         cpf,
+        role: 'DELIVERY_MAN',
       },
     })
 
@@ -57,17 +59,18 @@ export class PrismaDeliveryMansRepository implements DeliveryMansRepository {
   }
 
   async delete(deliveryMan: DeliveryMan): Promise<void> {
-    const data = PrismaDeliveryManMapper.toPrisma(deliveryMan)
-
     await this.prisma.user.delete({
       where: {
-        id: data.id,
+        id: deliveryMan.id.toString(),
       },
     })
   }
 
   async findMany({ page }: PaginationParams): Promise<DeliveryMan[]> {
     const deliveryMans = await this.prisma.user.findMany({
+      where: {
+        role: 'DELIVERY_MAN',
+      },
       take: 20,
       skip: (page - 1) * 20,
     })

@@ -21,8 +21,8 @@ export class DeliveryMan extends Entity<DeliveryManProps> {
   }
 
   static create(props: DeliveryManProps, id?: UniqueEntityID) {
-    const student = new DeliveryMan(props, id)
+    const deliveryMan = new DeliveryMan(props, id)
 
-    return student
+    return deliveryMan
   }
 }

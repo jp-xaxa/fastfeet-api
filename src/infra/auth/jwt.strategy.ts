@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
+  role: z.enum(['ADMINISTRATOR', 'DELIVERY_MAN']),
 })
 
 export type UserPayload = z.infer<typeof tokenPayloadSchema>

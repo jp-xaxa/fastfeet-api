@@ -5,6 +5,6 @@ export class DeliveryManAlreadyExistsError
   implements UseCaseError
 {
   constructor(identifier: string) {
-    super(`Student "${identifier}" already exists.`)
+    super(`Delivery Man "${identifier}" already exists.`)
   }
 }
