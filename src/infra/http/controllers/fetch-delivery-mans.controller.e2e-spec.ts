@@ -5,14 +5,12 @@ import request from 'supertest'
 
 import { AppModule } from '@/infra/app.module.js'
 import { DatabaseModule } from '@/infra/database/database.module.js'
-import { PrismaService } from '@/infra/database/prisma/prisma.service.js'
 
 import { DeliveryManFactory } from '@/test/factories/make-delivery-man.js'
 import { AdministratorFactory } from '@/test/factories/make-administrator.js'
 
-describe('Delete Delivery Man (E2E)', () => {
+describe('Fetch delivery man (E2E)', () => {
   let app: INestApplication
-  let prisma: PrismaService
   let deliveryManFactory: DeliveryManFactory
   let administratorFactory: AdministratorFactory
   let jwt: JwtService
@@ -25,7 +23,6 @@ describe('Delete Delivery Man (E2E)', () => {
 
     app = moduleRef.createNestApplication()
 
-    prisma = moduleRef.get(PrismaService)
     deliveryManFactory = moduleRef.get(DeliveryManFactory)
     administratorFactory = moduleRef.get(AdministratorFactory)
     jwt = moduleRef.get(JwtService)
@@ -33,7 +30,7 @@ describe('Delete Delivery Man (E2E)', () => {
     await app.init()
   })
 
-  test('[DELETE] /delivery-man/:id', async () => {
+  test('[GET] /delivery-man', async () => {
     const administrator = await administratorFactory.makePrismaAdministrator()
 
     const accessToken = jwt.sign({
@@ -41,23 +38,26 @@ describe('Delete Delivery Man (E2E)', () => {
       role: 'ADMINISTRATOR',
     })
 
-    const deliveryMan = await deliveryManFactory.makePrismaDeliveryMan()
-
-    const deliveryManId = deliveryMan.id.toString()
+    await Promise.all([
+      deliveryManFactory.makePrismaDeliveryMan({
+        name: 'João',
+      }),
+      deliveryManFactory.makePrismaDeliveryMan({
+        name: 'Pedro',
+      }),
+    ])
 
     const response = await request(app.getHttpServer())
-      .delete(`/delivery-man/${deliveryManId}`)
+      .get('/delivery-man')
       .set('Authorization', `Bearer ${accessToken}`)
       .send()
 
-    expect(response.statusCode).toBe(204)
-
-    const deliveryManOnDatabase = await prisma.user.findUnique({
-      where: {
-        id: deliveryManId,
-      },
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toEqual({
+      deliveryMans: expect.arrayContaining([
+        expect.objectContaining({ name: 'João' }),
+        expect.objectContaining({ name: 'Pedro' }),
+      ]),
     })
-
-    expect(deliveryManOnDatabase).toBeNull()
   })
 })
