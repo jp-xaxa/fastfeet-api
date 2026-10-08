@@ -32,7 +32,7 @@ export class Administrator extends Entity<AdministratorProps> {
   }
 
   static create(
-    props: Optional<Administrator, 'createdAt'>,
+    props: Optional<AdministratorProps, 'createdAt'>,
     id?: UniqueEntityID,
   ) {
     const administrator = new Administrator(

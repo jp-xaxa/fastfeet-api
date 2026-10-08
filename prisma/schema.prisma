@@ -25,3 +25,18 @@ model User {
 
   @@map("users")
 }
+
+model Recipient {
+  id              String   @id @default(uuid())
+  name            String
+  street          String
+  neighborhood    String
+  number          Int?
+  complement      String?
+  cep             String
+  uf              String
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime? @updatedAt @map("updated_at")
+
+  @@map("recipients")
+}
