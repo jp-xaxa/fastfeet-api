@@ -1,3 +1,5 @@
+import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.js'
+
 import { InMemoryDeliveryMansRepository } from '@/test/repositories/in-memory-delivery-man-repository.js'
 import { makeDeliveryMan } from '@/test/factories/make-delivery-man.js'
 
@@ -25,22 +27,10 @@ describe('Delete Delivery Man', () => {
     expect(inMemoryDeliveryMansRepository.items).toHaveLength(0)
   })
 
-  // it('should not be able to delete a answer from another user', async () => {
-  //   const newAnswer = makeAnswer(
-  //     {
-  //       authorId: new UniqueEntityID('author-1'),
-  //     },
-  //     new UniqueEntityID('answer-1'),
-  //   )
+  it('should not be able to delete a delivery man who does not exist', async () => {
+    const result = await sut.execute({ deliveryManId: 'delivery-man-1' })
 
-  //   await inMemoryAnswersRepository.create(newAnswer)
-
-  //   const result = await sut.execute({
-  //     answerId: 'answer-1',
-  //     authorId: 'author-2',
-  //   })
-
-  //   expect(result.isLeft()).toBe(true)
-  //   expect(result.value).toBeInstanceOf(NotAllowedError)
-  // })
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+  })
 })
