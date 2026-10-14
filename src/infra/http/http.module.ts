@@ -12,6 +12,11 @@ import { CreateRecipientController } from './controllers/create-recipient.contro
 import { DeleteRecipientController } from './controllers/delete-recipient.controller.js'
 import { EditRecipientController } from './controllers/edit-recipient.controller.js'
 import { FetchRecipientsController } from './controllers/fetch-recipient.controller.js'
+import { CreateOrderController } from './controllers/create-order.controller.js'
+import { DeleteOrderController } from './controllers/delete-order.controller.js'
+import { EditOrderController } from './controllers/edit-order.controller.js'
+import { FetchOrdersController } from './controllers/fetch-order.controller.js'
+import { GetOrderByIdController } from './controllers/get-order-by-id.controller.js'
 
 import { AuthenticateUsersUseCase } from '@/domain/carrier/application/use-cases/authenticate-users.js'
 import { RegisterDeliveryManUseCase } from '@/domain/carrier/application/use-cases/register-delivery-man.js'
@@ -22,6 +27,11 @@ import { CreateRecipientUseCase } from '@/domain/carrier/application/use-cases/c
 import { DeleteRecipientUseCase } from '@/domain/carrier/application/use-cases/delete-recipient.js'
 import { EditRecipientUseCase } from '@/domain/carrier/application/use-cases/edit-recipient.js'
 import { FetchRecipientsUseCase } from '@/domain/carrier/application/use-cases/fetch-recipient.js'
+import { CreateOrderUseCase } from '@/domain/carrier/application/use-cases/create-order.js'
+import { DeleteOrderUseCase } from '@/domain/carrier/application/use-cases/delete-order.js'
+import { EditOrderUseCase } from '@/domain/carrier/application/use-cases/edit-order.js'
+import { FetchOrdersUseCase } from '@/domain/carrier/application/use-cases/fetch-order.js'
+import { GetOrderByIdUseCase } from '@/domain/carrier/application/use-cases/get-order-by-id.js'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
@@ -35,6 +45,11 @@ import { FetchRecipientsUseCase } from '@/domain/carrier/application/use-cases/f
     DeleteRecipientController,
     EditRecipientController,
     FetchRecipientsController,
+    CreateOrderController,
+    DeleteOrderController,
+    EditOrderController,
+    FetchOrdersController,
+    GetOrderByIdController,
   ],
   providers: [
     AuthenticateUsersUseCase,
@@ -46,6 +61,11 @@ import { FetchRecipientsUseCase } from '@/domain/carrier/application/use-cases/f
     DeleteRecipientUseCase,
     EditRecipientUseCase,
     FetchRecipientsUseCase,
+    CreateOrderUseCase,
+    DeleteOrderUseCase,
+    EditOrderUseCase,
+    FetchOrdersUseCase,
+    GetOrderByIdUseCase,
   ],
 })
 export class HttpModule {}

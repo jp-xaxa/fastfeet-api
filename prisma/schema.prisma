@@ -23,6 +23,8 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime? @updatedAt @map("updated_at")
 
+  orders        Order[] @relation("deliveryMan")
+
   @@map("users")
 }
 
@@ -38,5 +40,23 @@ model Recipient {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime? @updatedAt @map("updated_at")
 
+  orders          Order[]
+
   @@map("recipients")
+}
+
+model Order {
+  id                String          @id @default(uuid())
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime?       @updatedAt @map("updated_at")
+  waitingAt         DateTime?       @map("waiting_at")
+  withdrawnAt       DateTime?       @map("withdrawn_at")
+  deliveryAt        DateTime?       @map("delivery_at")
+  recipientId       String          @map("recipient_id")
+  deliveryManId     String?         @map("delivery_man_id")
+
+  recipient         Recipient       @relation(fields: [recipientId], references: [id])
+  deliveryMan       User?           @relation("deliveryMan", fields: [deliveryManId], references: [id])
+
+  @@map("orders")
 }

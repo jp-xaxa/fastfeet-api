@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Controller,
   HttpCode,
   Delete,
@@ -11,6 +12,7 @@ import { Roles } from '@/infra/auth/roles.decorator.js'
 
 import { DeleteRecipientUseCase } from '@/domain/carrier/application/use-cases/delete-recipient.js'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error.js'
+import { RecipientHasOrdersError } from '@/domain/carrier/application/use-cases/errors/recipient-has-orders-error.js'
 
 @Controller('/recipient/:id')
 @Roles(['ADMINISTRATOR'])
@@ -30,6 +32,8 @@ export class DeleteRecipientController {
       switch (error.constructor) {
         case ResourceNotFoundError:
           throw new NotFoundException(error.message)
+        case RecipientHasOrdersError:
+          throw new ConflictException(error.message)
         default:
           throw new BadRequestException(error.message)
       }

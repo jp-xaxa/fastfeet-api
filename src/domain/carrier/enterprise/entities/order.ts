@@ -2,31 +2,35 @@ import { Entity } from '@/core/entities/entity.js'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.js'
 import { Optional } from '@/core/types/optional.js'
 
-interface OrderProps {
-  clientId: UniqueEntityID
+export interface OrderProps {
+  recipientId: UniqueEntityID
   deliveryManId?: UniqueEntityID | null
-  deliveryStatus?: string
-  postedAt: Date
+  createdAt: Date
+  updatedAt?: Date | null
+  waitingAt?: Date | null
   withdrawnAt?: Date | null
   deliveryAt?: Date | null
-  updatedAt?: Date | null
 }
 
 export class Order extends Entity<OrderProps> {
-  get clientId() {
-    return this.props.clientId
+  get recipientId() {
+    return this.props.recipientId
   }
 
   get deliveryManId() {
     return this.props.deliveryManId
   }
 
-  get deliveryStatus() {
-    return this.props.deliveryStatus
+  get createdAt() {
+    return this.props.createdAt
   }
 
-  get postedAt() {
-    return this.props.postedAt
+  get updatedAt() {
+    return this.props.updatedAt
+  }
+
+  get waitingAt() {
+    return this.props.waitingAt
   }
 
   get withdrawnAt() {
@@ -37,16 +41,12 @@ export class Order extends Entity<OrderProps> {
     return this.props.deliveryAt
   }
 
-  get updatedAt() {
-    return this.props.updatedAt
-  }
-
   private touch() {
     this.props.updatedAt = new Date()
   }
 
-  set clientId(clientName: UniqueEntityID) {
-    this.props.clientId = clientName
+  set recipientId(recipientId: UniqueEntityID) {
+    this.props.recipientId = recipientId
 
     this.touch()
   }
@@ -57,20 +57,30 @@ export class Order extends Entity<OrderProps> {
     this.touch()
   }
 
-  static create(
-    props: Optional<OrderProps, 'postedAt' | 'withdrawnAt' | 'deliveryAt'>,
-    id?: UniqueEntityID,
-  ) {
-    const question = new Order(
+  set waitingAt(waitingAt: Date | null | undefined) {
+    this.props.waitingAt = waitingAt ?? null
+    this.touch()
+  }
+
+  set withdrawnAt(withdrawnAt: Date | null | undefined) {
+    this.props.withdrawnAt = withdrawnAt ?? null
+    this.touch()
+  }
+
+  set deliveryAt(deliveryAt: Date | null | undefined) {
+    this.props.deliveryAt = deliveryAt ?? null
+    this.touch()
+  }
+
+  static create(props: Optional<OrderProps, 'createdAt'>, id?: UniqueEntityID) {
+    const order = new Order(
       {
         ...props,
-        postedAt: props.postedAt ?? new Date(),
-        withdrawnAt: props.withdrawnAt ? props.withdrawnAt : null,
-        deliveryAt: props.deliveryAt ? props.deliveryAt : null,
+        createdAt: props.createdAt ?? new Date(),
       },
       id,
     )
 
-    return question
+    return order
   }
 }

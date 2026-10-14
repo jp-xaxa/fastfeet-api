@@ -9,18 +9,20 @@ import { PrismaService } from '@/infra/database/prisma/prisma.service.js'
 
 import { RecipientFactory } from '@/test/factories/make-recipient.js'
 import { AdministratorFactory } from '@/test/factories/make-administrator.js'
+import { OrderFactory } from '@/test/factories/make-order.js'
 
 describe('Delete Recipient (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let recipientFactory: RecipientFactory
   let administratorFactory: AdministratorFactory
+  let orderFactory: OrderFactory
   let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [AdministratorFactory, RecipientFactory],
+      providers: [AdministratorFactory, RecipientFactory, OrderFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
@@ -28,6 +30,7 @@ describe('Delete Recipient (E2E)', () => {
     prisma = moduleRef.get(PrismaService)
     administratorFactory = moduleRef.get(AdministratorFactory)
     recipientFactory = moduleRef.get(RecipientFactory)
+    orderFactory = moduleRef.get(OrderFactory)
     jwt = moduleRef.get(JwtService)
 
     await app.init()
@@ -59,5 +62,35 @@ describe('Delete Recipient (E2E)', () => {
     })
 
     expect(deliveryManOnDatabase).toBeNull()
+  })
+
+  test('[DELETE] /recipient/:id (recipient with orders)', async () => {
+    const administrator = await administratorFactory.makePrismaAdministrator()
+
+    const accessToken = jwt.sign({
+      sub: administrator.id.toString(),
+      role: 'ADMINISTRATOR',
+    })
+
+    const recipient = await recipientFactory.makePrismaRecipient()
+
+    await orderFactory.makePrismaOrder({ recipientId: recipient.id })
+
+    const recipientId = recipient.id.toString()
+
+    const response = await request(app.getHttpServer())
+      .delete(`/recipient/${recipientId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send()
+
+    expect(response.statusCode).toBe(409)
+
+    const recipientOnDatabase = await prisma.recipient.findUnique({
+      where: {
+        id: recipientId,
+      },
+    })
+
+    expect(recipientOnDatabase).toBeTruthy()
   })
 })
