@@ -78,13 +78,14 @@ export class Order extends Entity<OrderProps> {
     this.touch()
   }
 
-  markAsWithdrawn() {
+  markAsWithdrawn(deliveryManId: UniqueEntityID) {
     if (this.status !== 'waiting') {
       throw new Error(
         `Order "${this.id.toString()}" is "${this.status}" and cannot be marked as withdrawn.`,
       )
     }
 
+    this.props.deliveryManId = deliveryManId
     this.props.withdrawnAt = new Date()
     this.touch()
   }

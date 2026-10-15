@@ -7,6 +7,7 @@ import { InMemoryRecipientsRepository } from '@/test/repositories/in-memory-reci
 import { InMemoryOrdersRepository } from '@/test/repositories/in-memory-order-repository.js'
 import { InMemoryDeliveryMansRepository } from '@/test/repositories/in-memory-delivery-man-repository.js'
 import { makeOrder } from '@/test/factories/make-order.js'
+import { makeDeliveryMan } from '@/test/factories/make-delivery-man.js'
 
 let inMemoryOrdersRepository: InMemoryOrdersRepository
 let inMemoryDeliveryMansRepository: InMemoryDeliveryMansRepository
@@ -23,7 +24,10 @@ describe('Update Order Status For Withdrawn', () => {
       inMemoryDeliveryMansRepository,
     )
 
-    sut = new UpdateOrderStatusForWithdrawnUseCase(inMemoryOrdersRepository)
+    sut = new UpdateOrderStatusForWithdrawnUseCase(
+      inMemoryOrdersRepository,
+      inMemoryDeliveryMansRepository,
+    )
   })
 
   afterEach(() => {
@@ -35,6 +39,10 @@ describe('Update Order Status For Withdrawn', () => {
     vi.useFakeTimers()
     vi.setSystemTime(now)
 
+    const deliveryMan = makeDeliveryMan()
+
+    await inMemoryDeliveryMansRepository.create(deliveryMan)
+
     const order = makeOrder({ waitingAt: new Date(2026, 0, 1) })
 
     await inMemoryOrdersRepository.create(order)
@@ -43,11 +51,15 @@ describe('Update Order Status For Withdrawn', () => {
 
     const result = await sut.execute({
       orderId: order.id.toString(),
+      deliveryManId: deliveryMan.id.toString(),
     })
 
     expect(result.isRight()).toBe(true)
     expect(saveSpy).toHaveBeenCalledTimes(1)
     expect(inMemoryOrdersRepository.items[0].withdrawnAt).toEqual(now)
+    expect(inMemoryOrdersRepository.items[0].deliveryManId).toEqual(
+      deliveryMan.id,
+    )
     expect(inMemoryOrdersRepository.items[0].status).toBe('withdrawn')
   })
 
@@ -68,6 +80,10 @@ describe('Update Order Status For Withdrawn', () => {
   ])(
     'should not be able to update a order status for withdrawn when it is %s',
     async (_status, override) => {
+      const deliveryMan = makeDeliveryMan()
+
+      await inMemoryDeliveryMansRepository.create(deliveryMan)
+
       const order = makeOrder(override)
 
       await inMemoryOrdersRepository.create(order)
@@ -76,20 +92,46 @@ describe('Update Order Status For Withdrawn', () => {
 
       const result = await sut.execute({
         orderId: order.id.toString(),
+        deliveryManId: deliveryMan.id.toString(),
       })
 
       expect(result.isLeft()).toBe(true)
       expect(result.value).toBeInstanceOf(OrderNotWaitingError)
       expect(saveSpy).not.toHaveBeenCalled()
+      expect(inMemoryOrdersRepository.items[0].deliveryManId).toBeUndefined()
       expect(inMemoryOrdersRepository.items[0].withdrawnAt).toEqual(
         'withdrawnAt' in override ? override.withdrawnAt : undefined,
       )
     },
   )
 
+  it('should not be able to update a order status for withdrawn with a delivery man does not exist', async () => {
+    const order = makeOrder({ waitingAt: new Date(2026, 0, 1) })
+
+    await inMemoryOrdersRepository.create(order)
+
+    const saveSpy = vi.spyOn(inMemoryOrdersRepository, 'save')
+
+    const result = await sut.execute({
+      orderId: order.id.toString(),
+      deliveryManId: 'delivery-man-1',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+    expect(saveSpy).not.toHaveBeenCalled()
+    expect(inMemoryOrdersRepository.items[0].deliveryManId).toBeUndefined()
+    expect(inMemoryOrdersRepository.items[0].withdrawnAt).toBeUndefined()
+  })
+
   it('should not be able to update a order does not exist', async () => {
+    const deliveryMan = makeDeliveryMan()
+
+    await inMemoryDeliveryMansRepository.create(deliveryMan)
+
     const result = await sut.execute({
       orderId: 'order-1',
+      deliveryManId: deliveryMan.id.toString(),
     })
 
     expect(result.isLeft()).toBe(true)

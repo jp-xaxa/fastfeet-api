@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { INestApplication } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
@@ -52,6 +53,8 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
       role: 'ADMINISTRATOR',
     })
 
+    const deliveryMan = await deliveryManFactory.makePrismaDeliveryMan()
+
     const recipient = await recipientFactory.makePrismaRecipient()
 
     const order = await orderFactory.makePrismaOrder({
@@ -66,7 +69,9 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
     const response = await request(app.getHttpServer())
       .patch(`/order/${orderId}/status-for-withdrawn`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send()
+      .send({
+        deliveryManId: deliveryMan.id.toString(),
+      })
 
     const requestFinishedAt = new Date()
 
@@ -79,6 +84,7 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
     })
 
     expect(orderOnDatabase).toBeTruthy()
+    expect(orderOnDatabase?.deliveryManId).toEqual(deliveryMan.id.toString())
     expect(orderOnDatabase?.withdrawnAt).toBeInstanceOf(Date)
     expect(orderOnDatabase?.withdrawnAt?.getTime()).toBeGreaterThanOrEqual(
       requestStartedAt.getTime(),
@@ -96,6 +102,8 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
       role: 'ADMINISTRATOR',
     })
 
+    const deliveryMan = await deliveryManFactory.makePrismaDeliveryMan()
+
     const recipient = await recipientFactory.makePrismaRecipient()
 
     const order = await orderFactory.makePrismaOrder({
@@ -107,7 +115,9 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
     const response = await request(app.getHttpServer())
       .patch(`/order/${orderId}/status-for-withdrawn`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send()
+      .send({
+        deliveryManId: deliveryMan.id.toString(),
+      })
 
     expect(response.statusCode).toBe(400)
 
@@ -117,6 +127,43 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
       },
     })
 
+    expect(orderOnDatabase?.deliveryManId).toBeNull()
+    expect(orderOnDatabase?.withdrawnAt).toBeNull()
+  })
+
+  test('[PATCH] /order/:id/status-for-withdrawn (delivery man not registered)', async () => {
+    const administrator = await administratorFactory.makePrismaAdministrator()
+
+    const accessToken = jwt.sign({
+      sub: administrator.id.toString(),
+      role: 'ADMINISTRATOR',
+    })
+
+    const recipient = await recipientFactory.makePrismaRecipient()
+
+    const order = await orderFactory.makePrismaOrder({
+      recipientId: recipient.id,
+      waitingAt: new Date(),
+    })
+
+    const orderId = order.id.toString()
+
+    const response = await request(app.getHttpServer())
+      .patch(`/order/${orderId}/status-for-withdrawn`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        deliveryManId: randomUUID(),
+      })
+
+    expect(response.statusCode).toBe(404)
+
+    const orderOnDatabase = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    })
+
+    expect(orderOnDatabase?.deliveryManId).toBeNull()
     expect(orderOnDatabase?.withdrawnAt).toBeNull()
   })
 
@@ -140,7 +187,9 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
     const response = await request(app.getHttpServer())
       .patch(`/order/${orderId}/status-for-withdrawn`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send()
+      .send({
+        deliveryManId: deliveryMan.id.toString(),
+      })
 
     expect(response.statusCode).toBe(403)
 
@@ -150,6 +199,7 @@ describe('Update Order Status for Withdrawn (E2E)', () => {
       },
     })
 
+    expect(orderOnDatabase?.deliveryManId).toBeNull()
     expect(orderOnDatabase?.withdrawnAt).toBeNull()
   })
 })
