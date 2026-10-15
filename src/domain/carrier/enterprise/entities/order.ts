@@ -2,6 +2,8 @@ import { Entity } from '@/core/entities/entity.js'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.js'
 import { Optional } from '@/core/types/optional.js'
 
+export type OrderStatus = 'pending' | 'waiting' | 'withdrawn' | 'delivered'
+
 export interface OrderProps {
   recipientId: UniqueEntityID
   deliveryManId?: UniqueEntityID | null
@@ -57,18 +59,22 @@ export class Order extends Entity<OrderProps> {
     this.touch()
   }
 
-  set waitingAt(waitingAt: Date | null | undefined) {
-    this.props.waitingAt = waitingAt ?? null
-    this.touch()
+  get status(): OrderStatus {
+    if (this.props.deliveryAt) return 'delivered'
+    if (this.props.withdrawnAt) return 'withdrawn'
+    if (this.props.waitingAt) return 'waiting'
+
+    return 'pending'
   }
 
-  set withdrawnAt(withdrawnAt: Date | null | undefined) {
-    this.props.withdrawnAt = withdrawnAt ?? null
-    this.touch()
-  }
+  markAsWaiting() {
+    if (this.status !== 'pending') {
+      throw new Error(
+        `Order "${this.id.toString()}" is "${this.status}" and cannot be marked as waiting.`,
+      )
+    }
 
-  set deliveryAt(deliveryAt: Date | null | undefined) {
-    this.props.deliveryAt = deliveryAt ?? null
+    this.props.waitingAt = new Date()
     this.touch()
   }
 

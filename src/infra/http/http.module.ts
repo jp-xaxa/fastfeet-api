@@ -17,6 +17,7 @@ import { DeleteOrderController } from './controllers/delete-order.controller.js'
 import { EditOrderController } from './controllers/edit-order.controller.js'
 import { FetchOrdersController } from './controllers/fetch-order.controller.js'
 import { GetOrderByIdController } from './controllers/get-order-by-id.controller.js'
+import { UpdateOrderStatusForWaitingController } from './controllers/update-order-status-for-waiting.controller.js'
 
 import { AuthenticateUsersUseCase } from '@/domain/carrier/application/use-cases/authenticate-users.js'
 import { RegisterDeliveryManUseCase } from '@/domain/carrier/application/use-cases/register-delivery-man.js'
@@ -32,6 +33,7 @@ import { DeleteOrderUseCase } from '@/domain/carrier/application/use-cases/delet
 import { EditOrderUseCase } from '@/domain/carrier/application/use-cases/edit-order.js'
 import { FetchOrdersUseCase } from '@/domain/carrier/application/use-cases/fetch-order.js'
 import { GetOrderByIdUseCase } from '@/domain/carrier/application/use-cases/get-order-by-id.js'
+import { UpdateOrderStatusForWaitingUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-waiting.js'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
@@ -50,6 +52,7 @@ import { GetOrderByIdUseCase } from '@/domain/carrier/application/use-cases/get-
     EditOrderController,
     FetchOrdersController,
     GetOrderByIdController,
+    UpdateOrderStatusForWaitingController,
   ],
   providers: [
     AuthenticateUsersUseCase,
@@ -66,6 +69,7 @@ import { GetOrderByIdUseCase } from '@/domain/carrier/application/use-cases/get-
     EditOrderUseCase,
     FetchOrdersUseCase,
     GetOrderByIdUseCase,
+    UpdateOrderStatusForWaitingUseCase,
   ],
 })
 export class HttpModule {}
