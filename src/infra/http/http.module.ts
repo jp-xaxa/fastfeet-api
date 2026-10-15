@@ -18,6 +18,7 @@ import { EditOrderController } from './controllers/edit-order.controller.js'
 import { FetchOrdersController } from './controllers/fetch-order.controller.js'
 import { GetOrderByIdController } from './controllers/get-order-by-id.controller.js'
 import { UpdateOrderStatusForWaitingController } from './controllers/update-order-status-for-waiting.controller.js'
+import { UpdateOrderStatusForWithdrawnController } from './controllers/update-order-status-for-withdrawn.controller.js'
 
 import { AuthenticateUsersUseCase } from '@/domain/carrier/application/use-cases/authenticate-users.js'
 import { RegisterDeliveryManUseCase } from '@/domain/carrier/application/use-cases/register-delivery-man.js'
@@ -34,6 +35,7 @@ import { EditOrderUseCase } from '@/domain/carrier/application/use-cases/edit-or
 import { FetchOrdersUseCase } from '@/domain/carrier/application/use-cases/fetch-order.js'
 import { GetOrderByIdUseCase } from '@/domain/carrier/application/use-cases/get-order-by-id.js'
 import { UpdateOrderStatusForWaitingUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-waiting.js'
+import { UpdateOrderStatusForWithdrawnUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-withdrawn.js'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
@@ -53,6 +55,7 @@ import { UpdateOrderStatusForWaitingUseCase } from '@/domain/carrier/application
     FetchOrdersController,
     GetOrderByIdController,
     UpdateOrderStatusForWaitingController,
+    UpdateOrderStatusForWithdrawnController,
   ],
   providers: [
     AuthenticateUsersUseCase,
@@ -70,6 +73,7 @@ import { UpdateOrderStatusForWaitingUseCase } from '@/domain/carrier/application
     FetchOrdersUseCase,
     GetOrderByIdUseCase,
     UpdateOrderStatusForWaitingUseCase,
+    UpdateOrderStatusForWithdrawnUseCase,
   ],
 })
 export class HttpModule {}
