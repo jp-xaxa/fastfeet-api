@@ -90,6 +90,23 @@ export class Order extends Entity<OrderProps> {
     this.touch()
   }
 
+  markAsDelivered(deliveryManId: UniqueEntityID) {
+    if (this.status !== 'withdrawn') {
+      throw new Error(
+        `Order "${this.id.toString()}" is "${this.status}" and cannot be marked as delivered.`,
+      )
+    }
+
+    if (!this.props.deliveryManId?.equals(deliveryManId)) {
+      throw new Error(
+        `Order "${this.id.toString()}" can only be marked as delivered by the delivery man who withdrew it.`,
+      )
+    }
+
+    this.props.deliveryAt = new Date()
+    this.touch()
+  }
+
   static create(props: Optional<OrderProps, 'createdAt'>, id?: UniqueEntityID) {
     const order = new Order(
       {
