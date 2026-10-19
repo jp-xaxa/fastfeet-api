@@ -23,6 +23,7 @@ import { UpdateOrderStatusForWithdrawnController } from './controllers/update-or
 import { UpdateOrderStatusForDeliveredController } from './controllers/update-order-status-for-delivered.controller.js'
 import { FetchDeliveryManOrdersController } from './controllers/fetch-delivery-man-orders.controller.js'
 import { UpdateOrderStatusForReturnedController } from './controllers/update-order-status-for-returned.controller.js'
+import { FetchRecipientNotificationsController } from './controllers/fetch-recipient-notifications.controller.js'
 
 import { AuthenticateUsersUseCase } from '@/domain/carrier/application/use-cases/authenticate-users.js'
 import { RegisterDeliveryManUseCase } from '@/domain/carrier/application/use-cases/register-delivery-man.js'
@@ -43,6 +44,7 @@ import { UpdateOrderStatusForWithdrawnUseCase } from '@/domain/carrier/applicati
 import { UpdateOrderStatusForDeliveredUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-delivered.js'
 import { FetchDeliveryManOrdersUseCase } from '@/domain/carrier/application/use-cases/fetch-delivery-man-orders.js'
 import { UpdateOrderStatusForReturnedUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-returned.js'
+import { FetchRecipientNotificationsUseCase } from '@/domain/notification/application/use-cases/fetch-recipient-notifications.js'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule, StorageModule],
@@ -66,6 +68,7 @@ import { UpdateOrderStatusForReturnedUseCase } from '@/domain/carrier/applicatio
     UpdateOrderStatusForDeliveredController,
     FetchDeliveryManOrdersController,
     UpdateOrderStatusForReturnedController,
+    FetchRecipientNotificationsController,
   ],
   providers: [
     AuthenticateUsersUseCase,
@@ -87,6 +90,7 @@ import { UpdateOrderStatusForReturnedUseCase } from '@/domain/carrier/applicatio
     UpdateOrderStatusForDeliveredUseCase,
     FetchDeliveryManOrdersUseCase,
     UpdateOrderStatusForReturnedUseCase,
+    FetchRecipientNotificationsUseCase,
   ],
 })
 export class HttpModule {}

@@ -1,4 +1,4 @@
-// import { DomainEvents } from '@/core/events/domain-events.js'
+import { DomainEvents } from '@/core/events/domain-events.js'
 import { Order } from '@/domain/carrier/enterprise/entities/order.js'
 import { PaginationParams } from '@/core/repositories/pagination-params.js'
 import { OrdersRepository } from '@/domain/carrier/application/repositories/orders-repository.js'
@@ -84,10 +84,14 @@ export class InMemoryOrdersRepository implements OrdersRepository {
     const itemIndex = this.items.findIndex((item) => item.id === order.id)
 
     this.items[itemIndex] = order
+
+    DomainEvents.dispatchEventsForAggregate(order.id)
   }
 
   async create(order: Order) {
     this.items.push(order)
+
+    DomainEvents.dispatchEventsForAggregate(order.id)
   }
 
   async delete(order: Order) {

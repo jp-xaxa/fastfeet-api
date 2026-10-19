@@ -1,6 +1,8 @@
-import { Entity } from '@/core/entities/entity.js'
+import { AggregateRoot } from '@/core/entities/aggregate-root.js'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.js'
 import { Optional } from '@/core/types/optional.js'
+import { OrderCreatedEvent } from '../events/order-created-event.js'
+import { OrderStatusUpdatedEvent } from '../events/order-status-updated-event.js'
 
 export type OrderStatus =
   'pending' | 'waiting' | 'withdrawn' | 'delivered' | 'returned'
@@ -18,7 +20,7 @@ export interface OrderProps {
   returnReason?: string | null
 }
 
-export class Order extends Entity<OrderProps> {
+export class Order extends AggregateRoot<OrderProps> {
   get recipientId() {
     return this.props.recipientId
   }
@@ -93,6 +95,8 @@ export class Order extends Entity<OrderProps> {
 
     this.props.waitingAt = new Date()
     this.touch()
+
+    this.addDomainEvent(new OrderStatusUpdatedEvent(this, 'waiting'))
   }
 
   markAsWithdrawn(deliveryManId: UniqueEntityID) {
@@ -105,6 +109,8 @@ export class Order extends Entity<OrderProps> {
     this.props.deliveryManId = deliveryManId
     this.props.withdrawnAt = new Date()
     this.touch()
+
+    this.addDomainEvent(new OrderStatusUpdatedEvent(this, 'withdrawn'))
   }
 
   markAsDelivered(deliveryManId: UniqueEntityID, photoId: UniqueEntityID) {
@@ -123,6 +129,8 @@ export class Order extends Entity<OrderProps> {
     this.props.photoId = photoId
     this.props.deliveryAt = new Date()
     this.touch()
+
+    this.addDomainEvent(new OrderStatusUpdatedEvent(this, 'delivered'))
   }
 
   markAsReturned(reason: string) {
@@ -135,6 +143,8 @@ export class Order extends Entity<OrderProps> {
     this.props.returnReason = reason
     this.props.returnedAt = new Date()
     this.touch()
+
+    this.addDomainEvent(new OrderStatusUpdatedEvent(this, 'returned'))
   }
 
   static create(props: Optional<OrderProps, 'createdAt'>, id?: UniqueEntityID) {
@@ -145,6 +155,12 @@ export class Order extends Entity<OrderProps> {
       },
       id,
     )
+
+    const isNewOrder = !id
+
+    if (isNewOrder) {
+      order.addDomainEvent(new OrderCreatedEvent(order))
+    }
 
     return order
   }

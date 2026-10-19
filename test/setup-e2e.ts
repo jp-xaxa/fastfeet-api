@@ -8,6 +8,7 @@ import { rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { envSchema } from '@/infra/env/env.js'
+import { DomainEvents } from '@/core/events/domain-events.js'
 
 config({ path: '.env', override: true })
 config({ path: '.env.test', override: true })
@@ -44,6 +45,8 @@ const prisma = new PrismaClient({
 
 beforeAll(async () => {
   execSync('npx prisma migrate deploy')
+
+  DomainEvents.shouldRun = false
 })
 
 afterAll(async () => {

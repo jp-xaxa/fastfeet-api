@@ -6,6 +6,7 @@ import { Order } from '@/domain/carrier/enterprise/entities/order.js'
 import { PrismaOrderMapper } from '../mappers/prisma-order-mapper.js'
 import { OrderDetails } from '@/domain/carrier/enterprise/entities/value-objects/order-details.js'
 import { PrismaOrderDetailsMapper } from '../mappers/prisma-order-details-mapper.js'
+import { DomainEvents } from '@/core/events/domain-events.js'
 
 @Injectable()
 export class PrismaOrdersRepository implements OrdersRepository {
@@ -64,6 +65,8 @@ export class PrismaOrdersRepository implements OrdersRepository {
     await this.prisma.order.create({
       data,
     })
+
+    DomainEvents.dispatchEventsForAggregate(order.id)
   }
 
   async save(order: Order): Promise<void> {
@@ -75,6 +78,8 @@ export class PrismaOrdersRepository implements OrdersRepository {
       },
       data,
     })
+
+    DomainEvents.dispatchEventsForAggregate(order.id)
   }
 
   async delete(order: Order): Promise<void> {

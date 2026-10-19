@@ -5,6 +5,7 @@ import { createObserveModule } from '@nestjs/observe'
 import { AuthModule } from './auth/auth.module.js'
 import { HttpModule } from './http/http.module.js'
 import { EnvModule } from './env/env.module.js'
+import { EventsModule } from './events/events.module.js'
 import { envSchema } from './env/env.js'
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule()
@@ -25,6 +26,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule()
     AuthModule,
     HttpModule,
     EnvModule,
+    EventsModule,
   ],
 })
 export class AppModule {}

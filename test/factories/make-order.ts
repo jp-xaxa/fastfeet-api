@@ -29,7 +29,10 @@ export class OrderFactory {
   constructor(private prisma: PrismaService) {}
 
   async makePrismaOrder(data: Partial<OrderProps> = {}): Promise<Order> {
-    const order = makeOrder(data)
+    // Com id explícito a Order não gera OrderCreatedEvent: como ela é inserida
+    // direto no banco, o evento nunca seria disparado e ficaria pendente no
+    // DomainEvents, impedindo que eventos futuros dessa mesma Order disparem
+    const order = makeOrder(data, new UniqueEntityID())
 
     await this.prisma.order.create({
       data: PrismaOrderMapper.toPrisma(order),

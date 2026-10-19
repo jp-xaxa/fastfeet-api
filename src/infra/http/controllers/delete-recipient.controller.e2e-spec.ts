@@ -10,6 +10,7 @@ import { PrismaService } from '@/infra/database/prisma/prisma.service.js'
 import { RecipientFactory } from '@/test/factories/make-recipient.js'
 import { AdministratorFactory } from '@/test/factories/make-administrator.js'
 import { OrderFactory } from '@/test/factories/make-order.js'
+import { NotificationFactory } from '@/test/factories/make-notification.js'
 
 describe('Delete Recipient (E2E)', () => {
   let app: INestApplication
@@ -17,12 +18,18 @@ describe('Delete Recipient (E2E)', () => {
   let recipientFactory: RecipientFactory
   let administratorFactory: AdministratorFactory
   let orderFactory: OrderFactory
+  let notificationFactory: NotificationFactory
   let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [AdministratorFactory, RecipientFactory, OrderFactory],
+      providers: [
+        AdministratorFactory,
+        RecipientFactory,
+        OrderFactory,
+        NotificationFactory,
+      ],
     }).compile()
 
     app = moduleRef.createNestApplication()
@@ -31,9 +38,42 @@ describe('Delete Recipient (E2E)', () => {
     administratorFactory = moduleRef.get(AdministratorFactory)
     recipientFactory = moduleRef.get(RecipientFactory)
     orderFactory = moduleRef.get(OrderFactory)
+    notificationFactory = moduleRef.get(NotificationFactory)
     jwt = moduleRef.get(JwtService)
 
     await app.init()
+  })
+
+  test('[DELETE] /recipient/:id (recipient with notifications)', async () => {
+    const administrator = await administratorFactory.makePrismaAdministrator()
+
+    const accessToken = jwt.sign({
+      sub: administrator.id.toString(),
+      role: 'ADMINISTRATOR',
+    })
+
+    const recipient = await recipientFactory.makePrismaRecipient()
+
+    await notificationFactory.makePrismaNotification({
+      recipientId: recipient.id,
+    })
+
+    const recipientId = recipient.id.toString()
+
+    const response = await request(app.getHttpServer())
+      .delete(`/recipient/${recipientId}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send()
+
+    expect(response.statusCode).toBe(204)
+
+    const notificationsOnDatabase = await prisma.notification.findMany({
+      where: {
+        recipientId,
+      },
+    })
+
+    expect(notificationsOnDatabase).toHaveLength(0)
   })
 
   test('[DELETE] /recipient/:id', async () => {

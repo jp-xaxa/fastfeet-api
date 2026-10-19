@@ -6,12 +6,14 @@ import { PrismaAdministratorsRepository } from './prisma/repositories/prisma-adm
 import { PrismaRecipientsRepository } from './prisma/repositories/prisma-recipient-repository.js'
 import { PrismaOrdersRepository } from './prisma/repositories/prisma-order-repository.js'
 import { PrismaPhotosRepository } from './prisma/repositories/prisma-photo-repository.js'
+import { PrismaNotificationsRepository } from './prisma/repositories/prisma-notifications-repository.js'
 
 import { DeliveryMansRepository } from '@/domain/carrier/application/repositories/delivery-man-repository.js'
 import { AdministratorsRepository } from '@/domain/carrier/application/repositories/administrator-repository.js'
 import { RecipientsRepository } from '@/domain/carrier/application/repositories/recipient-repository.js'
 import { OrdersRepository } from '@/domain/carrier/application/repositories/orders-repository.js'
 import { PhotosRepository } from '@/domain/carrier/application/repositories/photos-repository.js'
+import { NotificationsRepository } from '@/domain/notification/application/repositories/notifications-repository.js'
 
 @Module({
   imports: [],
@@ -37,6 +39,10 @@ import { PhotosRepository } from '@/domain/carrier/application/repositories/phot
       provide: PhotosRepository,
       useClass: PrismaPhotosRepository,
     },
+    {
+      provide: NotificationsRepository,
+      useClass: PrismaNotificationsRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -45,6 +51,7 @@ import { PhotosRepository } from '@/domain/carrier/application/repositories/phot
     RecipientsRepository,
     OrdersRepository,
     PhotosRepository,
+    NotificationsRepository,
   ],
 })
 export class DatabaseModule {}
