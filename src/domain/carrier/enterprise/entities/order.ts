@@ -12,6 +12,7 @@ export interface OrderProps {
   waitingAt?: Date | null
   withdrawnAt?: Date | null
   deliveryAt?: Date | null
+  photoId?: UniqueEntityID | null
 }
 
 export class Order extends Entity<OrderProps> {
@@ -41,6 +42,10 @@ export class Order extends Entity<OrderProps> {
 
   get deliveryAt() {
     return this.props.deliveryAt
+  }
+
+  get photoId() {
+    return this.props.photoId
   }
 
   private touch() {
@@ -90,7 +95,7 @@ export class Order extends Entity<OrderProps> {
     this.touch()
   }
 
-  markAsDelivered(deliveryManId: UniqueEntityID) {
+  markAsDelivered(deliveryManId: UniqueEntityID, photoId: UniqueEntityID) {
     if (this.status !== 'withdrawn') {
       throw new Error(
         `Order "${this.id.toString()}" is "${this.status}" and cannot be marked as delivered.`,
@@ -103,6 +108,7 @@ export class Order extends Entity<OrderProps> {
       )
     }
 
+    this.props.photoId = photoId
     this.props.deliveryAt = new Date()
     this.touch()
   }

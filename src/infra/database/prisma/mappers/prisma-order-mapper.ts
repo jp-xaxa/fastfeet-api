@@ -15,6 +15,7 @@ export class PrismaOrderMapper {
         waitingAt: raw.waitingAt,
         withdrawnAt: raw.withdrawnAt,
         deliveryAt: raw.deliveryAt,
+        photoId: raw.photoId ? new UniqueEntityID(raw.photoId) : null,
       },
       new UniqueEntityID(raw.id),
     )
@@ -30,6 +31,7 @@ export class PrismaOrderMapper {
       waitingAt: order.waitingAt,
       withdrawnAt: order.withdrawnAt,
       deliveryAt: order.deliveryAt,
+      photoId: order.photoId?.toString() ?? null,
     }
   }
 }

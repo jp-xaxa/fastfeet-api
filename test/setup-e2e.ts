@@ -4,6 +4,9 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../src/generated/prisma/client.js'
 import { randomUUID } from 'node:crypto'
 import { execSync } from 'node:child_process'
+import { rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { envSchema } from '@/infra/env/env.js'
 
 config({ path: '.env', override: true })
@@ -28,6 +31,10 @@ const databaseURL = generateUniqueDatabaseURL(schemaId)
 
 process.env.DATABASE_URL = databaseURL
 
+const storagePath = join(tmpdir(), 'fastfeet-e2e', schemaId)
+
+process.env.STORAGE_PATH = storagePath
+
 const prisma = new PrismaClient({
   adapter: new PrismaPg(
     { connectionString: databaseURL },
@@ -42,4 +49,5 @@ beforeAll(async () => {
 afterAll(async () => {
   await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`)
   await prisma.$disconnect()
+  await rm(storagePath, { recursive: true, force: true })
 })

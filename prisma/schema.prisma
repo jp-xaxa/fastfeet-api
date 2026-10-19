@@ -54,9 +54,20 @@ model Order {
   deliveryAt        DateTime?       @map("delivery_at")
   recipientId       String          @map("recipient_id")
   deliveryManId     String?         @map("delivery_man_id")
+  photoId           String?         @unique @map("photo_id")
 
   recipient         Recipient       @relation(fields: [recipientId], references: [id])
   deliveryMan       User?           @relation("deliveryMan", fields: [deliveryManId], references: [id])
+  photo             Photo?          @relation(fields: [photoId], references: [id])
 
   @@map("orders")
+}
+
+model Photo {
+  id         String  @id @default(uuid())
+  url        String
+
+  order     Order?
+
+  @@map("photos")
 }

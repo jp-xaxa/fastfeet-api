@@ -1,12 +1,18 @@
 import {
   BadRequestException,
   Controller,
+  FileTypeValidator,
   ForbiddenException,
   HttpCode,
-  Patch,
+  MaxFileSizeValidator,
   NotFoundException,
   Param,
+  ParseFilePipe,
+  Patch,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 
 import { Roles } from '@/infra/auth/roles.decorator.js'
 import { CurrentUser } from '@/infra/auth/current-user-decorator.js'
@@ -25,10 +31,26 @@ export class UpdateOrderStatusForDeliveredController {
 
   @Patch()
   @HttpCode(204)
-  async handle(@CurrentUser() user: UserPayload, @Param('id') orderId: string) {
+  @UseInterceptors(FileInterceptor('photo'))
+  async handle(
+    @CurrentUser() user: UserPayload,
+    @Param('id') orderId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }), // 5mb
+          new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp)$/ }),
+        ],
+      }),
+    )
+    photo: Express.Multer.File,
+  ) {
     const result = await this.updateOrderStatusForDelivered.execute({
       orderId,
       deliveryManId: user.sub,
+      fileName: photo.originalname,
+      fileType: photo.mimetype,
+      body: photo.buffer,
     })
 
     if (result.isLeft()) {

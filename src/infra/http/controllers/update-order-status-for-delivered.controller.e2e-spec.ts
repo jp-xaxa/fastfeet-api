@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { INestApplication } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
@@ -60,7 +62,7 @@ describe('Update Order Status for Delivered (E2E)', () => {
     const response = await request(app.getHttpServer())
       .patch(`/order/${orderId}/status-for-delivered`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send()
+      .attach('photo', './test/e2e/sample-upload.png')
 
     const requestFinishedAt = new Date()
 
@@ -80,5 +82,19 @@ describe('Update Order Status for Delivered (E2E)', () => {
     expect(orderOnDatabase?.deliveryAt?.getTime()).toBeLessThanOrEqual(
       requestFinishedAt.getTime(),
     )
+    expect(orderOnDatabase?.photoId).toEqual(expect.any(String))
+
+    const photoOnDatabase = await prisma.photo.findUnique({
+      where: {
+        id: orderOnDatabase?.photoId ?? '',
+      },
+    })
+
+    expect(photoOnDatabase).toBeTruthy()
+    expect(
+      existsSync(
+        join(process.env.STORAGE_PATH ?? '', photoOnDatabase?.url ?? ''),
+      ),
+    ).toBe(true)
   })
 })

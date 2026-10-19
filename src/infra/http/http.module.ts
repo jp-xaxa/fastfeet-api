@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 
 import { DatabaseModule } from '../database/database.module.js'
 import { CryptographyModule } from '../cryptography/cryptography.module.js'
+import { StorageModule } from '../storage/storage.module.js'
 
 import { AuthenticateController } from './controllers/authenticate.controller.js'
 import { RegisterAccountController } from './controllers/register-account.controller.js'
@@ -40,7 +41,7 @@ import { UpdateOrderStatusForWithdrawnUseCase } from '@/domain/carrier/applicati
 import { UpdateOrderStatusForDeliveredUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-delivered.js'
 
 @Module({
-  imports: [DatabaseModule, CryptographyModule],
+  imports: [DatabaseModule, CryptographyModule, StorageModule],
   controllers: [
     AuthenticateController,
     RegisterAccountController,
