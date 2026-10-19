@@ -69,6 +69,8 @@ export class InMemoryOrdersRepository implements OrdersRepository {
       waitingAt: order.waitingAt,
       withdrawnAt: order.withdrawnAt,
       deliveryAt: order.deliveryAt,
+      returnedAt: order.returnedAt,
+      returnReason: order.returnReason,
     })
   }
 

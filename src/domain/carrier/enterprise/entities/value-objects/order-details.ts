@@ -12,6 +12,8 @@ export interface OrderDetailsProps {
   waitingAt?: Date | null
   withdrawnAt?: Date | null
   deliveryAt?: Date | null
+  returnedAt?: Date | null
+  returnReason?: string | null
 }
 
 export class OrderDetails extends ValueObject<OrderDetailsProps> {
@@ -45,6 +47,14 @@ export class OrderDetails extends ValueObject<OrderDetailsProps> {
 
   get deliveryAt() {
     return this.props.deliveryAt
+  }
+
+  get returnedAt() {
+    return this.props.returnedAt
+  }
+
+  get returnReason() {
+    return this.props.returnReason
   }
 
   static create(props: OrderDetailsProps) {

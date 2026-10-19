@@ -2,7 +2,8 @@ import { Entity } from '@/core/entities/entity.js'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id.js'
 import { Optional } from '@/core/types/optional.js'
 
-export type OrderStatus = 'pending' | 'waiting' | 'withdrawn' | 'delivered'
+export type OrderStatus =
+  'pending' | 'waiting' | 'withdrawn' | 'delivered' | 'returned'
 
 export interface OrderProps {
   recipientId: UniqueEntityID
@@ -13,6 +14,8 @@ export interface OrderProps {
   withdrawnAt?: Date | null
   deliveryAt?: Date | null
   photoId?: UniqueEntityID | null
+  returnedAt?: Date | null
+  returnReason?: string | null
 }
 
 export class Order extends Entity<OrderProps> {
@@ -48,6 +51,14 @@ export class Order extends Entity<OrderProps> {
     return this.props.photoId
   }
 
+  get returnedAt() {
+    return this.props.returnedAt
+  }
+
+  get returnReason() {
+    return this.props.returnReason
+  }
+
   private touch() {
     this.props.updatedAt = new Date()
   }
@@ -66,6 +77,7 @@ export class Order extends Entity<OrderProps> {
 
   get status(): OrderStatus {
     if (this.props.deliveryAt) return 'delivered'
+    if (this.props.returnedAt) return 'returned'
     if (this.props.withdrawnAt) return 'withdrawn'
     if (this.props.waitingAt) return 'waiting'
 
@@ -110,6 +122,18 @@ export class Order extends Entity<OrderProps> {
 
     this.props.photoId = photoId
     this.props.deliveryAt = new Date()
+    this.touch()
+  }
+
+  markAsReturned(reason: string) {
+    if (this.status !== 'withdrawn') {
+      throw new Error(
+        `Order "${this.id.toString()}" is "${this.status}" and cannot be marked as returned.`,
+      )
+    }
+
+    this.props.returnReason = reason
+    this.props.returnedAt = new Date()
     this.touch()
   }
 

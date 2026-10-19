@@ -127,6 +127,15 @@ describe('Update Order Status For Delivered', () => {
         deliveryAt: new Date(2026, 0, 3),
       },
     ],
+    [
+      'returned',
+      {
+        deliveryManId: new UniqueEntityID('delivery-man-1'),
+        waitingAt: new Date(2026, 0, 1),
+        withdrawnAt: new Date(2026, 0, 2),
+        returnedAt: new Date(2026, 0, 3),
+      },
+    ],
   ])(
     'should not be able to update a order status for delivered when it is %s',
     async (_status, override) => {

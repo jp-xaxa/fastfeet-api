@@ -52,6 +52,8 @@ model Order {
   waitingAt         DateTime?       @map("waiting_at")
   withdrawnAt       DateTime?       @map("withdrawn_at")
   deliveryAt        DateTime?       @map("delivery_at")
+  returnedAt        DateTime?       @map("returned_at")
+  returnReason      String?         @map("return_reason")
   recipientId       String          @map("recipient_id")
   deliveryManId     String?         @map("delivery_man_id")
   photoId           String?         @unique @map("photo_id")

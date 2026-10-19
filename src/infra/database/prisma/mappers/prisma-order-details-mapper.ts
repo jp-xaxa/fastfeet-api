@@ -26,6 +26,8 @@ export class PrismaOrderDetailsMapper {
       waitingAt: raw.waitingAt,
       withdrawnAt: raw.withdrawnAt,
       deliveryAt: raw.deliveryAt,
+      returnedAt: raw.returnedAt,
+      returnReason: raw.returnReason,
     })
   }
 }

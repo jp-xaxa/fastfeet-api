@@ -11,6 +11,8 @@ export class OrderPresenter {
       waitingAt: order.waitingAt ?? null,
       withdrawnAt: order.withdrawnAt ?? null,
       deliveryAt: order.deliveryAt ?? null,
+      returnedAt: order.returnedAt ?? null,
+      returnReason: order.returnReason ?? null,
     }
   }
 }
