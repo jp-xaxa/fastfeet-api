@@ -10,4 +10,8 @@ export abstract class OrdersRepository {
   abstract create(question: Order): Promise<void>
   abstract delete(question: Order): Promise<void>
   abstract findMany(params: PaginationParams): Promise<Order[]>
+  abstract findManyByDeliveryManId(
+    deliveryManId: string,
+    params: PaginationParams,
+  ): Promise<Order[]>
 }

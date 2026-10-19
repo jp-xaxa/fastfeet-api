@@ -21,6 +21,7 @@ import { GetOrderByIdController } from './controllers/get-order-by-id.controller
 import { UpdateOrderStatusForWaitingController } from './controllers/update-order-status-for-waiting.controller.js'
 import { UpdateOrderStatusForWithdrawnController } from './controllers/update-order-status-for-withdrawn.controller.js'
 import { UpdateOrderStatusForDeliveredController } from './controllers/update-order-status-for-delivered.controller.js'
+import { FetchDeliveryManOrdersController } from './controllers/fetch-delivery-man-orders.controller.js'
 
 import { AuthenticateUsersUseCase } from '@/domain/carrier/application/use-cases/authenticate-users.js'
 import { RegisterDeliveryManUseCase } from '@/domain/carrier/application/use-cases/register-delivery-man.js'
@@ -39,6 +40,7 @@ import { GetOrderByIdUseCase } from '@/domain/carrier/application/use-cases/get-
 import { UpdateOrderStatusForWaitingUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-waiting.js'
 import { UpdateOrderStatusForWithdrawnUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-withdrawn.js'
 import { UpdateOrderStatusForDeliveredUseCase } from '@/domain/carrier/application/use-cases/update-order-status-for-delivered.js'
+import { FetchDeliveryManOrdersUseCase } from '@/domain/carrier/application/use-cases/fetch-delivery-man-orders.js'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule, StorageModule],
@@ -60,6 +62,7 @@ import { UpdateOrderStatusForDeliveredUseCase } from '@/domain/carrier/applicati
     UpdateOrderStatusForWaitingController,
     UpdateOrderStatusForWithdrawnController,
     UpdateOrderStatusForDeliveredController,
+    FetchDeliveryManOrdersController,
   ],
   providers: [
     AuthenticateUsersUseCase,
@@ -79,6 +82,7 @@ import { UpdateOrderStatusForDeliveredUseCase } from '@/domain/carrier/applicati
     UpdateOrderStatusForWaitingUseCase,
     UpdateOrderStatusForWithdrawnUseCase,
     UpdateOrderStatusForDeliveredUseCase,
+    FetchDeliveryManOrdersUseCase,
   ],
 })
 export class HttpModule {}
