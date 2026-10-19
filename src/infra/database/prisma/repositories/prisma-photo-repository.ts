@@ -15,4 +15,13 @@ export class PrismaPhotosRepository implements PhotosRepository {
       data,
     })
   }
+
+  async delete(photo: Photo): Promise<void> {
+    // deleteMany não lança erro se a foto não chegou a ser criada
+    await this.prisma.photo.deleteMany({
+      where: {
+        id: photo.id.toString(),
+      },
+    })
+  }
 }

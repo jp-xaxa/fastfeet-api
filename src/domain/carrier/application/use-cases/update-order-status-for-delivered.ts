@@ -72,14 +72,28 @@ export class UpdateOrderStatusForDeliveredUseCase {
 
     const photo = Photo.create({ url })
 
-    await this.photosRepository.create(photo)
+    try {
+      await this.photosRepository.create(photo)
 
-    order.markAsDelivered(new UniqueEntityID(deliveryManId), photo.id)
+      order.markAsDelivered(new UniqueEntityID(deliveryManId), photo.id)
 
-    await this.ordersRepository.save(order)
+      await this.ordersRepository.save(order)
+    } catch (error) {
+      await this.discardPhoto(photo)
+
+      throw error
+    }
 
     return right({
       order,
     })
+  }
+
+  private async discardPhoto(photo: Photo) {
+    // Melhor esforço: uma falha na limpeza não pode esconder o erro original
+    await Promise.allSettled([
+      this.photosRepository.delete(photo),
+      this.uploader.delete(photo.url),
+    ])
   }
 }

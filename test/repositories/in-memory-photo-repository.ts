@@ -7,4 +7,8 @@ export class InMemoryPhotosRepository implements PhotosRepository {
   async create(photo: Photo) {
     this.items.push(photo)
   }
+
+  async delete(photo: Photo) {
+    this.items = this.items.filter((item) => !item.id.equals(photo.id))
+  }
 }

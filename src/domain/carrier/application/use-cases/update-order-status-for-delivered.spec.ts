@@ -190,4 +190,94 @@ describe('Update Order Status For Delivered', () => {
     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
     expect(fakeUploader.uploads).toHaveLength(0)
   })
+
+  it('should discard the uploaded photo when saving the photo fails', async () => {
+    const deliveryManId = new UniqueEntityID('delivery-man-1')
+
+    const order = makeOrder({
+      deliveryManId,
+      waitingAt: new Date(2026, 0, 1),
+      withdrawnAt: new Date(2026, 0, 2),
+    })
+
+    await inMemoryOrdersRepository.create(order)
+
+    const databaseError = new Error('Database unavailable')
+
+    vi.spyOn(inMemoryPhotosRepository, 'create').mockRejectedValueOnce(
+      databaseError,
+    )
+
+    await expect(
+      sut.execute({
+        orderId: order.id.toString(),
+        deliveryManId: deliveryManId.toString(),
+        ...photo,
+      }),
+    ).rejects.toBe(databaseError)
+
+    expect(fakeUploader.uploads).toHaveLength(0)
+    expect(inMemoryPhotosRepository.items).toHaveLength(0)
+  })
+
+  it('should discard the uploaded photo when saving the order fails', async () => {
+    const deliveryManId = new UniqueEntityID('delivery-man-1')
+
+    const order = makeOrder({
+      deliveryManId,
+      waitingAt: new Date(2026, 0, 1),
+      withdrawnAt: new Date(2026, 0, 2),
+    })
+
+    await inMemoryOrdersRepository.create(order)
+
+    const databaseError = new Error('Database unavailable')
+
+    vi.spyOn(inMemoryOrdersRepository, 'save').mockRejectedValueOnce(
+      databaseError,
+    )
+
+    await expect(
+      sut.execute({
+        orderId: order.id.toString(),
+        deliveryManId: deliveryManId.toString(),
+        ...photo,
+      }),
+    ).rejects.toBe(databaseError)
+
+    expect(fakeUploader.uploads).toHaveLength(0)
+    expect(inMemoryPhotosRepository.items).toHaveLength(0)
+  })
+
+  it('should keep the original error when discarding the photo also fails', async () => {
+    const deliveryManId = new UniqueEntityID('delivery-man-1')
+
+    const order = makeOrder({
+      deliveryManId,
+      waitingAt: new Date(2026, 0, 1),
+      withdrawnAt: new Date(2026, 0, 2),
+    })
+
+    await inMemoryOrdersRepository.create(order)
+
+    const databaseError = new Error('Database unavailable')
+
+    vi.spyOn(inMemoryOrdersRepository, 'save').mockRejectedValueOnce(
+      databaseError,
+    )
+    vi.spyOn(fakeUploader, 'delete').mockRejectedValueOnce(
+      new Error('Disk unavailable'),
+    )
+    vi.spyOn(inMemoryPhotosRepository, 'delete').mockRejectedValueOnce(
+      new Error('Database unavailable'),
+    )
+
+    await expect(
+      sut.execute({
+        orderId: order.id.toString(),
+        deliveryManId: deliveryManId.toString(),
+        ...photo,
+      }),
+    ).rejects.toBe(databaseError)
+  })
 })

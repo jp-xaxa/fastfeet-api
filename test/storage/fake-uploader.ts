@@ -23,4 +23,8 @@ export class FakeUploader implements Uploader {
 
     return { url }
   }
+
+  async delete(url: string): Promise<void> {
+    this.uploads = this.uploads.filter((upload) => upload.url !== url)
+  }
 }

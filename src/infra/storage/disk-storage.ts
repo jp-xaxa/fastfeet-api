@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { basename, join, resolve } from 'node:path'
 
 import {
@@ -24,5 +24,11 @@ export class DiskStorage implements Uploader {
     await writeFile(join(directory, url), body)
 
     return { url }
+  }
+
+  async delete(url: string): Promise<void> {
+    const directory = resolve(this.env.get('STORAGE_PATH'))
+
+    await rm(join(directory, basename(url)), { force: true })
   }
 }
